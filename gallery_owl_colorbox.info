@@ -1,0 +1,7 @@
+name = Gallery Owl Caroussel with colorbox
+description = Adds colorbox to Owl Caroussel galleries with specific class.
+package = Administration
+core = 7.x
+
+dependencies[] = owlcarousel
+dependencies[] = colorbox

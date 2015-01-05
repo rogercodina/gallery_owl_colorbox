@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Gallery Owl Caroussel with colorbox.
+ */
+
+/**
+ * Implements hook_page_alter().
+ *
+ * We add the JS code to add colorbox behaviour. Firstly, we build an associative array "image key" to "url".
+ * We assume that:
+ * 1) Images are in "field_imatges" field. This field belongs to node type "page" (Basic page).
+ * 2) Images are rendered in the same order that they appear in node object (which is 100% true so far).
+ */
+function gallery_owl_colorbox_page_alter(&$page) {
+
+	$arrayJavascript = 'var images = [];';
+
+	$arg = arg();
+	if(count($arg) >= 2 && $arg[0] == 'node') {
+		$node = node_load($arg[1]);
+		if($node->type == "page" && !empty($node->field_imatges)) {
+			$index = 0;
+			foreach($node->field_imatges[LANGUAGE_NONE] as $img) {
+				$arrayJavascript = $arrayJavascript . 'images[' . $index . '] = "' . file_create_url($img['uri']) . '";';
+				$index++;
+			}
+			
+			drupal_add_js($arrayJavascript . gallery_owl_colorbox_get_base_js(),
+			array('type' => 'inline', 'scope' => 'footer', 'weight' => 5)
+			);
+		}
+	}
+}
+
+/**
+ * Base JS code we need to add. This code uses the images array build in gallery_owl_colorbox_page_alter function.
+ */
+function gallery_owl_colorbox_get_base_js() {
+	$code = '
+	jQuery(document).ready(function() {	
+		jQuery(".owl-colorbox img").each(function(key, value) {
+			// If we use "this.src" we get the styled image, not the original.
+			jQuery(this).wrap("<a href=\'" + images[key] + "\' class=\'colorbox init-colorbox-processed cboxElement\' rel=\'gallery\'/>");
+	  	});
+	  	
+	  	jQuery(".owl-colorbox a.colorbox").colorbox({rel:\'gallery\'});
+	});';
+	return $code;
+}
