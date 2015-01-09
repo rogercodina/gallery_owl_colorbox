@@ -18,7 +18,7 @@ function gallery_owl_colorbox_page_alter(&$page) {
 	$arrayJavascript = 'var images = [];';
 
 	$arg = arg();
-	if(count($arg) >= 2 && $arg[0] == 'node') {
+	if(count($arg) >= 2 && $arg[0] == 'node' && $arg[1] != 'add') {
 		$node = node_load($arg[1]);
 		if($node->type == "page" && !empty($node->field_imatges)) {
 			$index = 0;
